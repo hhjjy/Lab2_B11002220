@@ -148,6 +148,7 @@ void Ball_touch_item()
 }
 void game_init()
 {
+    time_init();
     app_ball_init() ; 
     app_brick_init(); 
     app_paddle_init() ; 
