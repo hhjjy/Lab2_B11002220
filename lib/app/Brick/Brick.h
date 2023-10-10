@@ -11,7 +11,7 @@
 #define BRICK_NUM 24 
 #define BRICK_SPACE 4
 
-typedef struct {
+typedef struct abcd{
     uint16_t x;// 左上角座標 
     uint16_t y;
     uint8_t lives;//預設是2,1,0 刪除  
@@ -21,6 +21,5 @@ typedef struct {
 void Brick_Init(Brick* brick, uint16_t x, uint16_t y, uint8_t lives, uint32_t color);
 void Brick_Draw(Brick* brick);
 void Brick_Erase(Brick* brick);
-// int Ball_touch_brick(Ball *ball,Brick *brick) ; 
 
 #endif /* BRICK_H */

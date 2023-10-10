@@ -1,6 +1,5 @@
 #ifndef BALL_H
 #define BALL_H
-#include "Brick.h"
 #include "stm32f746xx.h"
 #include <stdlib.h>
 #include <time.h>
@@ -12,27 +11,19 @@
 #define BALL_INIT_X 240 
 #define BALL_INIT_Y 136
 
-typedef enum {
-    UP,
-    DOWN,
-    // LEFT,
-    // RIGHT,
-    UP_LEFT,
-    UP_RIGHT,
-    DOWN_LEFT,
-    DOWN_RIGHT
-} direction;
-typedef struct {
+
+typedef struct aaa{
     uint16_t x;
     uint16_t y;
-    direction dir;
+    int vx ; 
+    int vy ; 
     // uint32_t color;
 } Ball;
-direction Ball_get_random_direction();
+void Ball_get_random_direction(Ball *ball);
 int Ball_touch_wall() ; 
 // int Ball_touch_paddle(Paddle *paddle) ;
 void Ball_Clear(Ball *ball) ; 
-void Ball_Init(Ball* ball, uint16_t x, uint16_t y, direction dir);
+void Ball_Init(Ball* ball, uint16_t x, uint16_t y);
 void Ball_Draw(Ball* ball);
 void Ball_Erase(Ball* ball);
 void Ball_Move(Ball* ball);

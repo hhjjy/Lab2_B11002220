@@ -32,31 +32,3 @@ void Brick_Erase(Brick *brick)
 }
 //用測試檢驗
 // // 如果有碰到就回1
-// int Ball_touch_brick(Ball *ball, Brick *brick) 
-// {
-//     // 上
-//     // if(ball->x + BALL_RADIUS)
-//     // 下 
-
-
-//     // 左上
-
-//     // 左下 
-
-
-//     // 右上
-
-
-//     // 右下 
-
-
-//     if (ball->x + BALL_RADIUS >= brick->x && ball->x - BALL_RADIUS <= brick->x + BRICK_WIDTH
-//         && ball->y + BALL_RADIUS >= brick->y && ball->y - BALL_RADIUS <= brick->y + BRICK_HEIGHT) {
-//         // 如果球體碰到了磚塊，返回1
-//         return 1;
-//     } else {
-//         // 如果球體沒有碰到磚塊，返回0
-//     }
-//             return 0;
-
-// }

@@ -160,6 +160,8 @@ int main(void)
     if (external_event == BUTTON_LONG_PRESSED || external_event == BUTTON_PRESSED)
     {
       game_set_to_start(); // 開始倒數
+      BSP_LCD_Clear(LCD_COLOR_BLACK); 
+      game_init() ; 
     }
     char timeStr[6] = "";
     sprintf(timeStr, "%02d:%02d", get_time_now() / 60, get_time_now() % 60);
@@ -172,6 +174,17 @@ int main(void)
       char x_y_coord[16];
       sprintf(x_y_coord, "X:%3d Y:%3d", ts.touchX[0], ts.touchY[0]);
       BSP_LCD_DisplayStringAt(0, 200, (uint8_t *)x_y_coord, CENTER_MODE);
+      app_paddleMove(ts.touchX[0], ts.touchY[0]);
+    }
+    if (get_time_now() == 0)
+    { // DISPLAY WIN OR LOSE
+      if (app_get_game_win_or_lose() == 1)
+      {
+        BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"WIN", CENTER_MODE); 
+      }else 
+      {
+        BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"LOSE", CENTER_MODE); 
+      }
     }
   }
   /* USER CODE END 3 */
@@ -913,9 +926,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       ms_counter = (ms_counter + 1) % 100;
       if (ms_counter == 99)
       {
+        app_gameLoop(); 
         time_decrease();
       }
+
     }
+
   }
 }
 #define SHORT_PRESS_THRESHOLD 500
