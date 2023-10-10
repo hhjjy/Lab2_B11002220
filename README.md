@@ -1,0 +1,2 @@
+# Lab2_B11002220
+打磚塊遊戲在STM32F746G-DISCOVERY Board 上運行
