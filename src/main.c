@@ -146,6 +146,7 @@ int main(void)
   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
   app_brick_init();
+  app_paddle_init();  
   app_ball_init();
   /* USER CODE END 2 */
 
