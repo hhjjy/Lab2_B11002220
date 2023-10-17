@@ -54,6 +54,11 @@ void Ball_Draw(Ball* ball)
     // BSP_LCD_FillCircle
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
     BSP_LCD_FillCircle(ball->x, ball->y, BALL_RADIUS);
+    BSP_LCD_DrawPixel(ball->x-BALL_RADIUS, ball->y, LCD_COLOR_RED) ; 
+    BSP_LCD_DrawPixel(ball->x+BALL_RADIUS, ball->y, LCD_COLOR_RED) ; 
+    BSP_LCD_DrawPixel(ball->x, ball->y-BALL_RADIUS, LCD_COLOR_RED) ; 
+    BSP_LCD_DrawPixel(ball->x, ball->y+BALL_RADIUS, LCD_COLOR_RED) ; 
+
 }
 void Ball_Erase(Ball* ball)
 {
@@ -70,4 +75,15 @@ void Ball_Move(Ball* ball)
     ball ->y += ball->vy ;
     // draw 
     Ball_Draw(ball); 
+}
+int Ball_get_vx(Ball *ball) 
+{
+
+    return ball->vx ;
+
+}
+int Ball_get_vy(Ball *ball) 
+{
+    return ball->vy;
+
 }

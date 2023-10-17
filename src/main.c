@@ -23,6 +23,9 @@
 /* USER CODE BEGIN Includes */
 #include "app.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "time.h"
+#define DEBUG
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,7 +99,13 @@ Time convertSecondsToTime(int seconds)
   t.hour = (seconds / 3600) % 24;
   return t;
 }
-
+uint32_t last_exec_time = 0; // 上一次執行的時間
+void time_display()
+{
+  char word[10] = "" ; 
+  sprintf(word, "%2d:%2d" ,get_time_now()/60,get_time_now()%60) ; 
+  BSP_LCD_DisplayStringAt(0,10,(uint8_t *)word,CENTER_MODE) ; 
+}
 /* USER CODE END 0 */
 
 /**
@@ -115,8 +124,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  // �Ŧ���sPI11�OUSER
-
+  srand(time(NULL));
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -146,8 +154,9 @@ int main(void)
   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
   app_brick_init();
-  app_paddle_init();  
+  app_paddle_init();
   app_ball_init();
+  time_display();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -157,35 +166,64 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    if (external_event == BUTTON_LONG_PRESSED || external_event == BUTTON_PRESSED)
+    while (get_game_stat() == 0)
     {
-      game_set_to_start(); // 開始倒數
-      BSP_LCD_Clear(LCD_COLOR_BLACK); 
-      game_init() ; 
-    }
-    char timeStr[6] = "";
-    sprintf(timeStr, "%02d:%02d", get_time_now() / 60, get_time_now() % 60);
-    BSP_LCD_DisplayStringAt(0, 15, (uint8_t *)timeStr, CENTER_MODE);
-
-    TS_StateTypeDef ts;
-    BSP_TS_GetState(&ts);
-    if (ts.touchDetected)
-    {
-      char x_y_coord[16];
-      sprintf(x_y_coord, "X:%3d Y:%3d", ts.touchX[0], ts.touchY[0]);
-      BSP_LCD_DisplayStringAt(0, 200, (uint8_t *)x_y_coord, CENTER_MODE);
-      app_paddleMove(ts.touchX[0], ts.touchY[0]);
-    }
-    if (get_time_now() == 0)
-    { // DISPLAY WIN OR LOSE
-      if (app_get_game_win_or_lose() == 1)
+      /* code */
+      if (external_event == BUTTON_LONG_PRESSED || external_event == BUTTON_PRESSED)
       {
-        BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"WIN", CENTER_MODE); 
-      }else 
-      {
-        BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"LOSE", CENTER_MODE); 
+        external_event = IDLE;
+        BSP_LCD_Clear(LCD_COLOR_BLACK);
+        app_brick_init();
+        app_paddle_init();
+        app_ball_init();
+        game_init();
+        game_set_to_start();
       }
+    }
+    #ifdef DEBUG
+    
+    ball.vx= 0 ; 
+    ball.vy= -1 ; 
+    #endif
+    // bug : 當前從磚塊穿過，上面的碰撞點 不會撞到左右 但左右的碰撞點會彼此抵銷影響
+    // todo : 球網上時連續穿過3個磚塊中穿過 
+    // todo : 球
+    // 遊戲執行
+    int time_delay = 8;
+    while (get_game_stat() == 1)
+    {
+      /* code */
+      time_display();
+      
+      TS_StateTypeDef ts;
+      BSP_TS_GetState(&ts);
+      // 判斷是否有人按壓
+      if (ts.touchDetected)
+      {
+        char x_y_coord[16];
+        // sprintf(x_y_coord, "X:%3d Y:%3d", ts.touchX[0], ts.touchY[0]);
+        // BSP_LCD_DisplayStringAt(0, 200, (uint8_t *)x_y_coord, CENTER_MODE);
+        app_paddleMove(ts.touchX[0], ts.touchY[0]);
+      }
+
+      if (HAL_GetTick() - last_exec_time >= time_delay)
+      {                                 // 判斷是否到了 10ms 的時間點
+        last_exec_time = HAL_GetTick(); // 更新上一次執行的時間
+        // 執行需要做的事情
+        app_gameLoop();
+        if (app_get_game_win_or_lose() == 1 )
+        {
+          game_over();
+          ball_clear() ; 
+          BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"WIN", CENTER_MODE);
+        }
+      }
+    }
+
+    // 遊戲結束
+    if (get_game_stat() == 0)
+    { // DISPLAY WIN OR LOSE
+      // 角落
     }
   }
   /* USER CODE END 3 */
@@ -924,15 +962,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // HAL_GPIO_TogglePin(GPIOI,GPIO_PIN_1);
     if (get_game_stat() == 1)
     {
+      // app_gameLoop();
+
       ms_counter = (ms_counter + 1) % 100;
       if (ms_counter == 99)
       {
-        app_gameLoop(); 
-        time_decrease();
+        time_increase();
       }
-
     }
-
   }
 }
 #define SHORT_PRESS_THRESHOLD 500
@@ -944,6 +981,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == GPIO_PIN_11)
   {
+    if (get_game_stat() == 1 )
+    {
+      return ; 
+
+    }
     if (HAL_GPIO_ReadPin(GPIOI, GPIO_PIN_11) == GPIO_PIN_SET)
     {
       buttonPressStartTime = HAL_GetTick(); //

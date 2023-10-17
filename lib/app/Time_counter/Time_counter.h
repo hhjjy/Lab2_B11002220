@@ -2,7 +2,7 @@
 #pragma once
 #include "stm32f746xx.h"
 
-#define INIT_TIME 300 
+#define INIT_TIME 0 
 #define GAME_START 1  
 #define GAME_START 0  
 int game_start = 0 ; 
@@ -32,18 +32,14 @@ void game_over()
     game_start = 0 ;
 }
 //function:減1秒 
-void time_decrease(void)
+void time_increase(void)
 {
     if(game_start)
     {
-        if (sec_counter >0)
-        {
-            sec_counter -= 1 ; 
-        }
-        else 
-        {
-            game_start = 0 ; 
-        }
+        
+            sec_counter += 1 ; 
+    
+        
     }
 
 }

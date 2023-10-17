@@ -53,50 +53,60 @@ int Ball_touch_brick(Ball *ball, Brick *brick)
     if (ball->x <= brick->x + BRICK_WIDTH && ball->x >= brick->x &&
         (ball->y - BALL_RADIUS) <= brick->y + BRICK_HEIGHT && (ball->y - BALL_RADIUS) >= brick->y)
     {
+
+        // ball->vy = -ball->vy;
         return 1;
     }
     // down detected point
     if (ball->x <= brick->x + BRICK_WIDTH && ball->x >= brick->x &&
         (ball->y + BALL_RADIUS) <= brick->y + BRICK_HEIGHT && (ball->y + BALL_RADIUS) >= brick->y)
     {
-        return 1;
+
+        // ball->vy = -ball->vy;
+        return 2;
     }
     // left detected point
     if ((ball->x - BALL_RADIUS) <= brick->x + BRICK_WIDTH && (ball->x - BALL_RADIUS) >= brick->x &&
         ball->y <= brick->y + BRICK_HEIGHT && ball->y >= brick->y)
     {
-        return 1;
+        // ball->vx = -ball->vx;
+        // ball->vy = -ball->vy;
+        return 3;
     }
     // right detected point
     if ((ball->x + BALL_RADIUS) <= brick->x + BRICK_WIDTH && (ball->x + BALL_RADIUS) >= brick->x &&
         ball->y <= brick->y + BRICK_HEIGHT && ball->y >= brick->y)
     {
-        return 1;
+        // ball->vx = -ball->vx;
+        // ball->vy = -ball->vy;
+
+        return 4;
     }
     return 0;
 }
-
+// TODO PAddle 移植往左邊撞
 int Ball_touch_paddle(Ball *ball, Paddle *paddle)
 {
     if (ball->y + BALL_RADIUS >= paddle->y && ball->y - BALL_RADIUS <= paddle->y + PADDLE_HEIGHT && ball->x >= paddle->x - PADDLE_WIDTH / 2 && ball->x <= paddle->x + PADDLE_WIDTH / 2)
     {
-        float temp = (ball->x - (paddle->x - PADDLE_WIDTH / 2)) / PADDLE_WIDTH;
-        // Left part
-        if (temp <= 0.33)
+        int temp = ball->x - (paddle->x - PADDLE_WIDTH / 2);
+
+        if (temp <= PADDLE_WIDTH / 3)
         {
             ball->vx = -1;
             ball->vy = -1;
         }
-        else if (temp <= 0.66) // middle
+        else if (temp <= PADDLE_WIDTH / 3 * 2)
         {
             ball->vx = 0;
             ball->vy = -1;
         }
-        else if (temp <= 1) // RIGTH
+        else if (temp <= PADDLE_WIDTH)
         {
             ball->vx = 1;
             ball->vy = -1;
         }
+
         return 1;
     }
     return 0;
@@ -110,69 +120,155 @@ int Ball_touch_wall(Ball *ball)
         ball->vx = -ball->vx;
         return 1;
     }
-    if (ball->y + BALL_RADIUS >= WALL_HEIGHT)
+    if (ball->y - BALL_RADIUS <= 0)
     {
         // 球撞到了上牆
-        ball->vx = -ball->vx;
         ball->vy = -ball->vy;
         return 1;
     }
-    if (ball->y - BALL_RADIUS <= 0)
+    if (ball->y + BALL_RADIUS >= WALL_HEIGHT)
+    {
         return -1;
+    }
     return 0;
 }
+uint8_t last_brick = -1;
+
+typedef enum lastelement
+{
+    NONE_ITEM,
+    BRICK_ITEM,
+    WALL_ITEM,
+    PADDLE_ITEM,
+} lastelement_t;
+lastelement_t lastitem = NONE_ITEM;
+
 void Ball_touch_item()
 {
+    // touch paddle
+
+    if (Ball_touch_paddle(&ball, &paddle))
+    {
+        last_brick = -1;
+        lastitem = PADDLE_ITEM;
+        // BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"touch_paddle", LEFT_MODE);
+    }
+    // touch wall
+    int touched_wall = Ball_touch_wall(&ball);
+    if (touched_wall == 1)
+    {
+        lastitem = WALL_ITEM;
+    }
+    else if (touched_wall == -1)
+    {
+        game_over();
+        Ball_Erase(&ball);
+
+        // BSP_LCD_SetTextColor(LCD_COLOR_BLACK) ;
+        // BSP_LCD_FillCircle(ball.x,ball.y, 25);
+        // BSP_LCD_SetTextColor(LCD_COLOR_WHITE) ;
+
+        BSP_LCD_DisplayStringAt(0, 272 / 2, (uint8_t *)"Game Over", CENTER_MODE);
+
+        return;
+    }
     // brick
     for (int i = 0; i < BRICK_NUM; i++)
     {
-
-        if (Ball_touch_brick(&ball, &brick[i]))
+        // 不能連續彈
+        if (brick[i].lives > 0)
         {
-            Brick_Erase(&brick[i]);
+            int result = Ball_touch_brick(&ball, &brick[i]);
+
+            switch (result)
+            {
+            case 0: // 沒碰到
+                break;
+            case 1:                                            // 球碰到上面
+                    last_brick = i;
+                    lastitem = BRICK_ITEM;
+                    ball.vy = -ball.vy;
+                    Brick_Erase(&brick[i]);
+                break;
+            case 2:                                            // 下
+                    last_brick = i;
+                    lastitem = BRICK_ITEM;
+                    ball.vy = -ball.vy;
+                    Brick_Erase(&brick[i]);
+                break;
+            case 3:                                            // 左
+                    last_brick = i;
+                    lastitem = BRICK_ITEM;
+                    ball.vx = -ball.vx;
+                    Brick_Erase(&brick[i]);
+                break;
+
+            case 4:                                            // 右
+                    last_brick = i;
+                    lastitem = BRICK_ITEM;
+                    ball.vx = -ball.vx;
+                    Brick_Erase(&brick[i]);
+                break;
+            default:
+                break;
+            }
+            // if (lastitem == BRICK && last_brick == i)
+            // //     continue;
+            // if (Ball_touch_brick(&ball, &brick[i]))
+            // {
+            //     lastitem = BRICK_ITEM;
+            //     last_brick = i ;
+            // }
         }
     }
-    // touch wall
-    if (Ball_touch_wall(&ball) == -1)
-    {
-        game_over();
-        BSP_LCD_DisplayStringAt(0, 272/2, (uint8_t *)"Game Over", CENTER_MODE);
-        return;
-    }
-    // touch paddle
-    if (Ball_touch_paddle(&ball, &paddle))
-    {
-        BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"touch_paddle", LEFT_MODE);
-    }
+
     // return item ;
 }
 void game_init()
 {
     time_init();
-    app_ball_init() ; 
-    app_brick_init(); 
-    app_paddle_init() ; 
+    app_ball_init();
+    app_brick_init();
+    app_paddle_init();
 }
-// should run every 10ms 
+// should run every 10ms
 void app_gameLoop()
 {
-    if(get_game_stat()== GAME_START)
+    if (get_game_stat() == 1)
     {
         Ball_touch_item();
         Ball_Move(&ball);
     }
 }
-void app_paddleMove(int x , int y )
+void app_paddleMove(int x, int y)
 {
     Paddle_Move(&paddle, x, y);
 }
 int app_get_game_win_or_lose()
 {
-    int win = 1; 
+    int win = 1;
     for (int i = 0; i < BRICK_NUM; i++)
     {
-        if(brick[i].lives != 0)
-            win = 0 ; 
+        if (brick[i].lives != 0)
+            win = 0;
     }
-    return win ;
+    return win;
+}
+int app_get_ball_vx()
+{
+
+    return ball.vx;
+}
+
+int app_get_ball_vy()
+{
+
+    return ball.vy;
+}
+void ball_clear()
+{
+    Ball_Clear(&ball);
+}
+void app_game_debug()
+{
 }
