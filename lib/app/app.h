@@ -157,13 +157,13 @@ void Ball_touch_item()
     int touched_wall = Ball_touch_wall(&ball);
     if (touched_wall == 1)
     {
+        last_brick = -1;
         lastitem = WALL_ITEM;
     }
     else if (touched_wall == -1)
     {
         game_over();
         Ball_Erase(&ball);
-
         // BSP_LCD_SetTextColor(LCD_COLOR_BLACK) ;
         // BSP_LCD_FillCircle(ball.x,ball.y, 25);
         // BSP_LCD_SetTextColor(LCD_COLOR_WHITE) ;
@@ -178,7 +178,7 @@ void Ball_touch_item()
         // 不能連續彈
         if (brick[i].lives > 0)
         {
-            int result = Ball_touch_brick(&ball, &brick[i]);
+            int result = Ball_touch_brick(&ball, &brick[i]);//碰到哪裡
 
             switch (result)
             {
@@ -271,4 +271,9 @@ void ball_clear()
 }
 void app_game_debug()
 {
+}
+
+
+void app_delete_brick(int i){
+    Brick_Erase(&brick[i]);
 }

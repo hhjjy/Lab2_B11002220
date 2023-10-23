@@ -25,7 +25,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "time.h"
-#define DEBUG
+#define DEBUG1
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -180,14 +180,104 @@ int main(void)
         game_set_to_start();
       }
     }
-    #ifdef DEBUG
-    
+    // 設定成我要測試的模式
+    #ifdef DEBUG1
+    // test 1 球網上時連續穿過3個磚塊中穿過 ; 
+    //設定ball 位置與速度
+    ball.x = 242 ; 
+    ball.y = 90 ; 
     ball.vx= 0 ; 
     ball.vy= -1 ; 
+    Ball_Move(&ball) ; 
+    //設定地圖長相！
+    #elif DEBUG2
+    // test 2 球網上時連續穿過3個磚塊中穿過 ; 
+    //設定地圖長相！
+    app_delete_brick(4); 
+    app_delete_brick(12); 
+    app_delete_brick(20); 
+    //設定ball 位置與速度
+    ball.x = 242 ; 
+    ball.y = 90 ; 
+    ball.vx= 0 ; 
+    ball.vy= -1 ; 
+    Ball_Move(&ball) ; 
+    #elif DEBUG3
+    // test 3 : 球從左上往右下
+    //設定地圖長相！
+    app_delete_brick(4); 
+    app_delete_brick(5); 
+    app_delete_brick(6); 
+    app_delete_brick(11); 
+    app_delete_brick(13); 
+    app_delete_brick(19); 
+    app_delete_brick(20); 
+    app_delete_brick(21); 
+    //設定ball 位置與速度
+    ball.x = 244 ; 
+    ball.y = 54 ; 
+    ball.vx= 1 ; 
+    ball.vy= 1 ; 
+    Ball_Move(&ball) ; 
+    #elif DEBUG4
+    // test 3 :球從右上往左下
+    //設定地圖長相！
+    app_delete_brick(4); 
+    app_delete_brick(5); 
+    app_delete_brick(6); 
+    app_delete_brick(11); 
+    app_delete_brick(13); 
+    app_delete_brick(19); 
+    app_delete_brick(20); 
+    app_delete_brick(21); 
+    //設定ball 位置與速度
+    ball.x = 314 ; 
+    ball.y = 54 ; 
+    ball.vx= -1 ; 
+    ball.vy= 1 ; 
+    Ball_Move(&ball) ; 
+
+    #elif DEBUG5
+    // test 3 : 球從左下上往右上
+    //設定地圖長相！
+    app_delete_brick(4); 
+    app_delete_brick(5); 
+    app_delete_brick(6); 
+    app_delete_brick(11); 
+    app_delete_brick(13); 
+    app_delete_brick(19); 
+    app_delete_brick(20); 
+    app_delete_brick(21); 
+    //設定ball 位置與速度
+    ball.x = 230 ; 
+    ball.y = 78 ; 
+    ball.vx= 1 ; 
+    ball.vy= -1 ; 
+    Ball_Move(&ball) ; 
+    #elif DEBUG6
+    // test 3 : 球從左上往右下
+    //設定地圖長相！
+    app_delete_brick(4); 
+    app_delete_brick(5); 
+    app_delete_brick(6); 
+    app_delete_brick(11); 
+    app_delete_brick(13); 
+    app_delete_brick(19); 
+    app_delete_brick(20); 
+    app_delete_brick(21); 
+    //設定ball 位置與速度
+    ball.x = 314 ; 
+    ball.y = 78 ; 
+    ball.vx= -1 ; 
+    ball.vy= -1 ; 
+    Ball_Move(&ball) ; 
     #endif
     // bug : 當前從磚塊穿過，上面的碰撞點 不會撞到左右 但左右的碰撞點會彼此抵銷影響
     // todo : 球網上時連續穿過3個磚塊中穿過 
-    // todo : 球
+    // todo : 球從右上角直接穿過去 
+    // todo : 如何debug ? => done 測試各種方向的結果與預期是否相同
+    // todo : 演算法改成偵測線為主
+
     // 遊戲執行
     int time_delay = 8;
     while (get_game_stat() == 1)
