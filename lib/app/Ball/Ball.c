@@ -1,35 +1,39 @@
 #include "Ball.h"
 void Ball_Clear(Ball *ball) 
 {
+    // int x, y , w,h ; 
+    // x = ball->x -BALL_RADIUS; 
+    // y = ball->y -BALL_RADIUS;
+    
     BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
     BSP_LCD_FillCircle(ball->x, ball->y, BALL_RADIUS);
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 }
 void Ball_get_random_direction(Ball *ball)
 {
-    int r = rand() % 6;
+    int r = rand() % 4;
     switch (r) {
-        case 0: // UP
-            ball->vx = 0 ; 
-            ball->vy = -1 ; 
-            return ;
-        case 1: // DOWN
-            ball->vx = 0 ; 
-            ball->vy = 1 ; 
-            return ;
-        case 2: // UP_LEFT
+        // case 0: // UP
+        //     ball->vx = 0 ; 
+        //     ball->vy = -1 ; 
+        //     return ;
+        // case 1: // DOWN
+        //     ball->vx = 0 ; 
+        //     ball->vy = 1 ; 
+        //     return ;
+        case 0: // UP_LEFT
             ball->vx = -1 ; 
             ball->vy = -1 ; 
             return ;
-        case 3: // UP_RIGHT
+        case 1: // UP_RIGHT
             ball->vx = 1 ; 
             ball->vy = -1 ; 
             return ;
-        case 4: // DOWN_LEFT
+        case 2: // DOWN_LEFT
             ball->vx = -1 ; 
             ball->vy = 1 ; 
             return ;
-        case 5: // DOWN_RIGHT
+        case 3: // DOWN_RIGHT
             ball->vx = 1 ; 
             ball->vy = 1 ; 
             return ;

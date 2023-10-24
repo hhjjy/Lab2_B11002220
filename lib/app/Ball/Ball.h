@@ -8,11 +8,11 @@
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 272 
 #define BALL_RADIUS 5
-// #define BALL_INIT_X 240 
-// #define BALL_INIT_Y 136
+#define BALL_INIT_X 240 
+#define BALL_INIT_Y 136
 
-#define BALL_INIT_X 200 
-#define BALL_INIT_Y 200
+// #define BALL_INIT_X 200 
+// #define BALL_INIT_Y 200
 typedef struct aaa{
     uint16_t x;
     uint16_t y;

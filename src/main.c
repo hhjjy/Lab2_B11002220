@@ -25,7 +25,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "time.h"
-#define DEBUG1
+// #define DEBUG
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -190,7 +190,7 @@ int main(void)
     ball.vy= -1 ; 
     Ball_Move(&ball) ; 
     //設定地圖長相！
-    #elif DEBUG2
+    #elif defined(DEBUG2)
     // test 2 球網上時連續穿過3個磚塊中穿過 ; 
     //設定地圖長相！
     app_delete_brick(4); 
@@ -202,47 +202,47 @@ int main(void)
     ball.vx= 0 ; 
     ball.vy= -1 ; 
     Ball_Move(&ball) ; 
-    #elif DEBUG3
+    #elif defined(DEBUG3)
     // test 3 : 球從左上往右下
     //設定地圖長相！
+    app_delete_brick(3); 
     app_delete_brick(4); 
     app_delete_brick(5); 
-    app_delete_brick(6); 
     app_delete_brick(11); 
     app_delete_brick(13); 
     app_delete_brick(19); 
     app_delete_brick(20); 
     app_delete_brick(21); 
     //設定ball 位置與速度
-    ball.x = 244 ; 
-    ball.y = 54 ; 
+    ball.x = 230 ; 
+    ball.y = 40 ; 
     ball.vx= 1 ; 
     ball.vy= 1 ; 
     Ball_Move(&ball) ; 
-    #elif DEBUG4
-    // test 3 :球從右上往左下
+    #elif defined(DEBUG4)
+    // test 4 :球從右上往左下
     //設定地圖長相！
+    app_delete_brick(3); 
     app_delete_brick(4); 
     app_delete_brick(5); 
-    app_delete_brick(6); 
     app_delete_brick(11); 
     app_delete_brick(13); 
     app_delete_brick(19); 
     app_delete_brick(20); 
     app_delete_brick(21); 
     //設定ball 位置與速度
-    ball.x = 314 ; 
-    ball.y = 54 ; 
+    ball.x = 316 ; 
+    ball.y = 40 ; 
     ball.vx= -1 ; 
     ball.vy= 1 ; 
     Ball_Move(&ball) ; 
 
-    #elif DEBUG5
+    #elif defined(DEBUG5)
     // test 3 : 球從左下上往右上
     //設定地圖長相！
+    app_delete_brick(3); 
     app_delete_brick(4); 
     app_delete_brick(5); 
-    app_delete_brick(6); 
     app_delete_brick(11); 
     app_delete_brick(13); 
     app_delete_brick(19); 
@@ -254,12 +254,12 @@ int main(void)
     ball.vx= 1 ; 
     ball.vy= -1 ; 
     Ball_Move(&ball) ; 
-    #elif DEBUG6
+    #elif defined(DEBUG6)
     // test 3 : 球從左上往右下
     //設定地圖長相！
+    app_delete_brick(3); 
     app_delete_brick(4); 
     app_delete_brick(5); 
-    app_delete_brick(6); 
     app_delete_brick(11); 
     app_delete_brick(13); 
     app_delete_brick(19); 
@@ -303,9 +303,13 @@ int main(void)
         app_gameLoop();
         if (app_get_game_win_or_lose() == 1 )
         {
+          Ball_Erase(&ball) ; 
+          BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+          BSP_LCD_FillRect(0,267,480,5) ; 
+          BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+          BSP_LCD_DisplayStringAt(0, 272 / 2, (uint8_t *)"Win", CENTER_MODE);          
           game_over();
-          ball_clear() ; 
-          BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"WIN", CENTER_MODE);
+
         }
       }
     }
@@ -314,6 +318,8 @@ int main(void)
     if (get_game_stat() == 0)
     { // DISPLAY WIN OR LOSE
       // 角落
+      //刪除 
+      ball_clear() ; 
     }
   }
   /* USER CODE END 3 */

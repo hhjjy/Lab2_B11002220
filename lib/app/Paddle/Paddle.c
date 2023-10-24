@@ -14,7 +14,7 @@ void Paddle_X_limit(Paddle *paddle)
     }
     else if (paddle->x+PADDLE_WIDTH/2 >= 480)
     {
-        paddle->x = 480-PADDLE_WIDTH/2;
+        paddle->x = 480-PADDLE_WIDTH/2-1;
     }
 }
 

@@ -49,6 +49,37 @@ void Brick_test()
 
 int Ball_touch_brick(Ball *ball, Brick *brick)
 {
+
+    // 先判斷4個角
+    // 球從左上角往右下角 done
+    if (ball->x + BALL_RADIUS == brick->x &&
+        ball->y + BALL_RADIUS == brick->y &&
+        ball->vx == 1 && ball->vy == 1)
+    {
+        return 5;
+    }
+    // 球從右上角往左下角撞 done
+    if (ball->x - BALL_RADIUS == brick->x + BRICK_WIDTH &&
+        ball->y + BALL_RADIUS == brick->y &&
+        ball->vx == -1 && ball->vy == 1)
+    {
+        return 6;
+    }
+    // 球從左下角往右上角撞 done
+    if (ball->x + BALL_RADIUS == brick->x &&
+        ball->y - BALL_RADIUS == brick->y + BRICK_HEIGHT &&
+        ball->vx == 1 && ball->vy == -1)
+    {
+        return 7;
+    }
+    // 球從右下角往左上角撞
+    if (ball->x - BALL_RADIUS == brick->x + BRICK_WIDTH &&
+        ball->y - BALL_RADIUS == brick->y + BRICK_HEIGHT &&
+        ball->vx == -1 && ball->vy == -1)
+    {
+        return 8;
+    }
+
     // up detected point
     if (ball->x <= brick->x + BRICK_WIDTH && ball->x >= brick->x &&
         (ball->y - BALL_RADIUS) <= brick->y + BRICK_HEIGHT && (ball->y - BALL_RADIUS) >= brick->y)
@@ -142,7 +173,7 @@ typedef enum lastelement
     PADDLE_ITEM,
 } lastelement_t;
 lastelement_t lastitem = NONE_ITEM;
-
+int count_for_conti_touch = 0 ; 
 void Ball_touch_item()
 {
     // touch paddle
@@ -162,13 +193,13 @@ void Ball_touch_item()
     }
     else if (touched_wall == -1)
     {
-        game_over();
-        Ball_Erase(&ball);
-        // BSP_LCD_SetTextColor(LCD_COLOR_BLACK) ;
-        // BSP_LCD_FillCircle(ball.x,ball.y, 25);
-        // BSP_LCD_SetTextColor(LCD_COLOR_WHITE) ;
-
+        Ball_Erase(&ball) ; 
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_FillRect(0,267,480,5) ; 
+        BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
         BSP_LCD_DisplayStringAt(0, 272 / 2, (uint8_t *)"Game Over", CENTER_MODE);
+        // game_start = 0 ; 
+        game_over();
 
         return;
     }
@@ -178,36 +209,96 @@ void Ball_touch_item()
         // 不能連續彈
         if (brick[i].lives > 0)
         {
-            int result = Ball_touch_brick(&ball, &brick[i]);//碰到哪裡
-
+            int result = Ball_touch_brick(&ball, &brick[i]); // 碰到哪裡
+            // if (result)
+            // {
+            //     char *words;
+            //     sprintf(words, "%d %d", ball.x, ball.y);
+            //     BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)words, LEFT_MODE);
+            // }
             switch (result)
             {
             case 0: // 沒碰到
                 break;
-            case 1:                                            // 球碰到上面
-                    last_brick = i;
-                    lastitem = BRICK_ITEM;
-                    ball.vy = -ball.vy;
-                    Brick_Erase(&brick[i]);
+            case 1: // 球碰到上面
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
                 break;
-            case 2:                                            // 下
-                    last_brick = i;
-                    lastitem = BRICK_ITEM;
-                    ball.vy = -ball.vy;
-                    Brick_Erase(&brick[i]);
+            case 2: // 下
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
                 break;
-            case 3:                                            // 左
+            case 3:               // 左
+                if (ball.vx == 0) // 往上往下的運動碰到左邊
+                {
                     last_brick = i;
                     lastitem = BRICK_ITEM;
-                    ball.vx = -ball.vx;
+                    ball.vy = 1;
                     Brick_Erase(&brick[i]);
+                    break;
+                }
+                if (last_brick == i && count_for_conti_touch++ < 3)
+                {// 防止連續撞擊 
+                    continue; 
+                }
+                count_for_conti_touch = 0 ; 
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                Brick_Erase(&brick[i]);
                 break;
 
-            case 4:                                            // 右
+            case 4:               // 右
+                if (ball.vx == 0) // 往上往下的運動碰到右邊
+                {
                     last_brick = i;
                     lastitem = BRICK_ITEM;
-                    ball.vx = -ball.vx;
+                    ball.vy = 1;
                     Brick_Erase(&brick[i]);
+                    break;
+                }
+                if (last_brick == i && count_for_conti_touch++ < 3)
+                {// 防止連續撞擊 
+                    continue; 
+                }
+                count_for_conti_touch = 0 ; 
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
+                break;
+            case 5:
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
+                break;
+            case 6:
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
+                break;
+            case 7:
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
+                break;
+            case 8:
+                last_brick = i;
+                lastitem = BRICK_ITEM;
+                ball.vx = -ball.vx;
+                ball.vy = -ball.vy;
+                Brick_Erase(&brick[i]);
                 break;
             default:
                 break;
@@ -238,6 +329,7 @@ void app_gameLoop()
     {
         Ball_touch_item();
         Ball_Move(&ball);
+
     }
 }
 void app_paddleMove(int x, int y)
@@ -267,13 +359,19 @@ int app_get_ball_vy()
 }
 void ball_clear()
 {
-    Ball_Clear(&ball);
+    // char *words;
+    // sprintf(words, "%d %d", ball.x, ball.y);
+    // BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)words, LEFT_MODE);
+    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    BSP_LCD_FillCircle(ball.x, ball.y, BALL_RADIUS);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);    
 }
 void app_game_debug()
 {
 }
 
-
-void app_delete_brick(int i){
+void app_delete_brick(int i)
+{
+    Brick_Erase(&brick[i]);
     Brick_Erase(&brick[i]);
 }

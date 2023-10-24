@@ -36,10 +36,7 @@ void time_increase(void)
 {
     if(game_start)
     {
-        
             sec_counter += 1 ; 
-    
-        
     }
 
 }
